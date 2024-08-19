@@ -24,6 +24,7 @@ const login = async () => {
     });
     checkout(signInRes.data.token);
   } catch (error) {
+    console.log(error);
     const errorMsg = error.response.data.message;
     errorMsgArr.value = errorMsg;
   }
@@ -54,12 +55,19 @@ const checkout = async (token) => {
 };
 
 const errorMsg = computed(() => {
-  const emailError = errorMsgArr.value.filter((item) => item.includes('email'));
-  const passwordError = errorMsgArr.value.filter((item) => item.includes('password'));
-  return {
-    email: emailError.join(', '),
-    password: passwordError.join(', ')
-  };
+  if (typeof errorMsgArr.value === 'object') {
+    const emailError = errorMsgArr.value.filter((item) => item.includes('email'));
+    const passwordError = errorMsgArr.value.filter((item) => item.includes('password'));
+    return {
+      email: emailError.join(', '),
+      password: passwordError.join(', ')
+    };
+  } else {
+    return {
+      email: errorMsgArr.value,
+      password: errorMsgArr.value
+    };
+  }
 });
 
 onMounted(() => {

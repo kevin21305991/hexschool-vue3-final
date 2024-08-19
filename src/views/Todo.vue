@@ -5,49 +5,62 @@ import axios from 'axios';
 import TodoList from '@/components/TodoList.vue';
 
 const apiBaseUrl = 'https://todolist-api.hexschool.io';
+
+// Todo list
+const todos = ref([]);
+const newTodo = ref('');
 const nickName = ref('');
 const token = ref('');
 const tabActiveIndex = ref(0);
-const todo = ref('');
-const todos = ref([
-  {
-    id: 1,
-    txt: '把冰箱發霉的檸檬拿去丟',
-    completed: false
-  },
-  {
-    id: 2,
-    txt: '打電話叫媽媽匯款給我',
-    completed: false
-  },
-  {
-    id: 3,
-    txt: '整理電腦資料夾',
-    completed: false
-  },
-  {
-    id: 4,
-    txt: '繳電費水費瓦斯費',
-    completed: false
-  },
-  {
-    id: 5,
-    txt: '約vicky禮拜三泡溫泉',
-    completed: false
-  },
-  {
-    id: 6,
-    txt: '約ada禮拜四吃晚餐',
-    completed: false
-  }
-]);
 
-const addTodoHandler = () => {
-  todos.value.push({
-    id: new Date().getTime(),
-    txt: todo.value,
-    completed: false
+// 獲取代辦清單
+const getTodos = async () => {
+  const response = await axios.get(`${apiBaseUrl}/todos`, {
+    headers: {
+      Authorization: token.value
+    }
   });
+  todos.value = response.data.data;
+  console.log(todos.value);
+};
+
+// 新增
+const addTodo = async () => {
+  if (!newTodo.value) return;
+  const todo = {
+    content: newTodo.value
+  };
+  await axios.post(`${apiBaseUrl}/todos`, todo, {
+    headers: {
+      Authorization: token.value
+    }
+  });
+  newTodo.value = '';
+  getTodos();
+};
+
+// 刪除
+const deleteTodo = async (id) => {
+  await axios.delete(`${apiBaseUrl}/todos/${id}`, {
+    headers: {
+      Authorization: token.value
+    }
+  });
+  getTodos();
+};
+
+// 切換狀態
+const toggleStatus = async (id) => {
+  await axios.patch(
+    `${apiBaseUrl}/todos/${id}/toggle`,
+    {},
+    {
+      headers: {
+        Authorization: token.value
+      }
+    }
+  );
+  getTodos();
 };
 
 // 登出
@@ -71,20 +84,12 @@ const signOut = async () => {
   }
 };
 
-const signOutHandler = () => {
-  signOut();
-};
-
-const removeTodoHandler = (todo) => {
-  todos.value = todos.value.filter((item) => item.id !== todo.id);
-};
-
 const incomplete = computed(() => {
-  return todos.value.filter((item) => !item.completed);
+  return todos.value.filter((item) => !item.status);
 });
 
 const complete = computed(() => {
-  return todos.value.filter((item) => item.completed);
+  return todos.value.filter((item) => item.status);
 });
 
 onMounted(() => {
@@ -94,6 +99,7 @@ onMounted(() => {
     ?.split('=')[1];
   nickName.value = JSON.parse(authInfo).user;
   token.value = JSON.parse(authInfo).token;
+  getTodos();
 });
 </script>
 
@@ -108,14 +114,14 @@ onMounted(() => {
             ><span>{{ nickName }} 的代辦</span></a
           >
         </li>
-        <li><a href="#" @click.prevent="signOutHandler">登出</a></li>
+        <li><a href="#" @click.prevent="signOut">登出</a></li>
       </ul>
     </nav>
     <div class="conatiner todoListPage vhContainer">
       <div class="todoList_Content">
         <div class="inputBox">
-          <input v-model="todo" type="text" placeholder="請輸入待辦事項" />
-          <a href="#" @click.prevent="addTodoHandler">
+          <input v-model="newTodo" type="text" placeholder="請輸入待辦事項" />
+          <a href="#" @click.prevent="addTodo">
             <i class="fa fa-plus"></i>
           </a>
         </div>
@@ -139,7 +145,8 @@ onMounted(() => {
               <TodoList
                 v-if="tabActiveIndex === 0"
                 :data="todos"
-                :remove-todo="removeTodoHandler"
+                :delete-todo="deleteTodo"
+                :toggle-status="toggleStatus"
               />
               <!-- 待完成 -->
               <TodoList

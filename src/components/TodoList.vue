@@ -10,7 +10,11 @@ const props = defineProps({
     type: String,
     default: 'All'
   },
-  removeTodo: {
+  deleteTodo: {
+    type: Function,
+    default: () => {}
+  },
+  toggleStatus: {
     type: Function,
     default: () => {}
   }
@@ -19,10 +23,10 @@ const props = defineProps({
 const result = computed(() => {
   const txt = props.status === 'incomplete' ? '個未完成項目' : '個已完成項目';
   if (props.status === 'incomplete') {
-    const incompleteLength = props.data.filter((item) => !item.completed).length;
+    const incompleteLength = props.data.filter((item) => !item.status).length;
     return `${incompleteLength} ${txt}`;
   } else {
-    const completeLength = props.data.filter((item) => item.completed).length;
+    const completeLength = props.data.filter((item) => item.status).length;
     return `${completeLength} ${txt}`;
   }
 });
@@ -32,10 +36,15 @@ const result = computed(() => {
   <ul class="todoList_item">
     <li v-for="item in data" :key="item.id">
       <label class="todoList_label">
-        <input class="todoList_input" type="checkbox" v-model="item.completed" />
-        <span>{{ item.txt }}</span>
+        <input
+          class="todoList_input"
+          type="checkbox"
+          v-model="item.status"
+          @change="toggleStatus(item.id)"
+        />
+        <span>{{ item.content }}</span>
       </label>
-      <a href="#" @click.prevent="removeTodo(item)">
+      <a href="#" @click.prevent="deleteTodo(item.id)">
         <i class="fa fa-times"></i>
       </a>
     </li>
