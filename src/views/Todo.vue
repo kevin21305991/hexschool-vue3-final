@@ -21,7 +21,6 @@ const getTodos = async () => {
     }
   });
   todos.value = response.data.data;
-  console.log(todos.value);
 };
 
 // 新增
