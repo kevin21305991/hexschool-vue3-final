@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import router from '@/router';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import TodoList from '@/components/TodoList.vue';
 
+const router = useRouter();
 const apiBaseUrl = 'https://todolist-api.hexschool.io';
 
 // Todo list
@@ -96,9 +97,13 @@ onMounted(() => {
     .split('; ')
     .find((row) => row.startsWith('authInfo='))
     ?.split('=')[1];
-  nickName.value = JSON.parse(authInfo).user;
-  token.value = JSON.parse(authInfo).token;
-  getTodos();
+  if (authInfo) {
+    nickName.value = JSON.parse(authInfo).user;
+    token.value = JSON.parse(authInfo).token;
+    getTodos();
+  } else {
+    router.push('/login');
+  }
 });
 </script>
 

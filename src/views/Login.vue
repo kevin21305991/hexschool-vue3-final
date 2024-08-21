@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import router from '@/router';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+const router = useRouter();
 const apiBaseUrl = 'https://todolist-api.hexschool.io';
 const loginForm = ref({
   email: '',
@@ -24,7 +25,6 @@ const login = async () => {
     });
     checkout(signInRes.data.token);
   } catch (error) {
-    console.log(error);
     const errorMsg = error.response.data.message;
     errorMsgArr.value = errorMsg;
   }
