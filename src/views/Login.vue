@@ -18,6 +18,14 @@ const submitHandler = () => {
 };
 
 const login = async () => {
+  if (loginForm.value.email === '') {
+    alert('Email不可為空');
+    return;
+  }
+  if (loginForm.value.email === '') {
+    alert('密碼不可為空');
+    return;
+  }
   try {
     const signInRes = await axios.post(`${apiBaseUrl}/users/sign_in`, {
       email: loginForm.value.email,

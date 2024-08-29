@@ -25,6 +25,10 @@ const router = createRouter({
       path: '/todo',
       name: 'todo',
       component: Todo
+    },
+    {
+      path: '/:pathMatch(.*)',
+      redirect: '/login'
     }
   ]
 });

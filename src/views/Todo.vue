@@ -26,7 +26,10 @@ const getTodos = async () => {
 
 // 新增
 const addTodo = async () => {
-  if (!newTodo.value) return;
+  if (!newTodo.value) {
+    alert('請輸入待辦事項');
+    return;
+  }
   const todo = {
     content: newTodo.value
   };
@@ -129,7 +132,10 @@ onMounted(() => {
             <i class="fa fa-plus"></i>
           </a>
         </div>
-        <div class="todoList_list">
+        <template v-if="todos.length <= 0">
+          <div>目前尚無待辦事項</div>
+        </template>
+        <div class="todoList_list" v-else>
           <ul class="todoList_tab">
             <li v-for="(item, index) in ['全部', '待完成', '已完成']" :key="item">
               <a
@@ -141,32 +147,22 @@ onMounted(() => {
             </li>
           </ul>
           <div class="todoList_items">
-            <template v-if="todos.length <= 0">
-              <div>目前尚無待辦事項</div>
-            </template>
-            <template v-else>
-              <!-- 全部 -->
-              <TodoList
-                v-if="tabActiveIndex === 0"
-                :data="todos"
-                :delete-todo="deleteTodo"
-                :toggle-status="toggleStatus"
-              />
-              <!-- 待完成 -->
-              <TodoList
-                v-else-if="incomplete && tabActiveIndex === 1"
-                :data="incomplete"
-                status="incomplete"
-                :remove-todo="removeTodoHandler"
-              />
-              <!-- 已完成 -->
-              <TodoList
-                v-else
-                :data="complete"
-                status="complete"
-                :remove-todo="removeTodoHandler"
-              />
-            </template>
+            <!-- 全部 -->
+            <TodoList
+              v-if="tabActiveIndex === 0"
+              :data="todos"
+              :delete-todo="deleteTodo"
+              :toggle-status="toggleStatus"
+            />
+            <!-- 待完成 -->
+            <TodoList
+              v-else-if="incomplete && tabActiveIndex === 1"
+              :data="incomplete"
+              status="incomplete"
+              :delete-todo="deleteTodo"
+            />
+            <!-- 已完成 -->
+            <TodoList v-else :data="complete" status="complete" :delete-todo="deleteTodo" />
           </div>
         </div>
       </div>

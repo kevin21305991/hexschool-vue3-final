@@ -19,6 +19,12 @@ const submitHandler = () => {
 };
 
 const register = async () => {
+  for (const field in registerForm.value) {
+    if (registerForm.value[field] === '') {
+      alert(`${field} 不可為空`);
+      return;
+    }
+  }
   try {
     const response = await axios.post(`${apiBaseUrl}/users/sign_up`, {
       email: registerForm.value.email,
