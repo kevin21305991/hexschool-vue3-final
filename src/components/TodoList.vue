@@ -21,7 +21,14 @@ const props = defineProps({
 });
 
 const result = computed(() => {
-  return props.data.filter((item) => !item.status).length;
+  const txt = props.status === 'complete' ? '個已完成項目' : '個待完成項目';
+  if (props.status === 'complete') {
+    const completeLength = props.data.filter((item) => item.status).length;
+    return `${completeLength} ${txt}`;
+  } else {
+    const incompleteLength = props.data.filter((item) => !item.status).length;
+    return `${incompleteLength} ${txt}`;
+  }
 });
 </script>
 
@@ -43,7 +50,7 @@ const result = computed(() => {
     </li>
   </ul>
   <div class="todoList_statistics">
-    <p>{{ result }} 個待完成項目</p>
+    <p>{{ result }}</p>
   </div>
 </template>
 
