@@ -127,7 +127,7 @@ onMounted(() => {
     <div class="conatiner todoListPage vhContainer">
       <div class="todoList_Content">
         <div class="inputBox">
-          <input v-model="newTodo" type="text" placeholder="請輸入待辦事項" />
+          <input v-model.trim="newTodo" type="text" placeholder="請輸入待辦事項" />
           <a href="#" @click.prevent="addTodo">
             <i class="fa fa-plus"></i>
           </a>
@@ -160,9 +160,16 @@ onMounted(() => {
               :data="incomplete"
               status="incomplete"
               :delete-todo="deleteTodo"
+              :toggle-status="toggleStatus"
             />
             <!-- 已完成 -->
-            <TodoList v-else :data="complete" status="complete" :delete-todo="deleteTodo" />
+            <TodoList
+              v-else
+              :data="complete"
+              status="complete"
+              :delete-todo="deleteTodo"
+              :toggle-status="toggleStatus"
+            />
           </div>
         </div>
       </div>
