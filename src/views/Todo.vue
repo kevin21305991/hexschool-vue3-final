@@ -3,10 +3,12 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import TodoList from '@/components/TodoList.vue';
+import Loading from '@/components/Loading.vue';
 
 const router = useRouter();
 const apiBaseUrl = 'https://todolist-api.hexschool.io';
 
+const isLoading = ref(false);
 // Todo list
 const todos = ref([]);
 const newTodo = ref('');
@@ -33,37 +35,55 @@ const addTodo = async () => {
   const todo = {
     content: newTodo.value
   };
-  await axios.post(`${apiBaseUrl}/todos`, todo, {
-    headers: {
-      Authorization: token.value
-    }
-  });
-  newTodo.value = '';
-  getTodos();
+  try {
+    isLoading.value = true;
+    await axios.post(`${apiBaseUrl}/todos`, todo, {
+      headers: {
+        Authorization: token.value
+      }
+    });
+    isLoading.value = false;
+    newTodo.value = '';
+    getTodos();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // 刪除
 const deleteTodo = async (id) => {
-  await axios.delete(`${apiBaseUrl}/todos/${id}`, {
-    headers: {
-      Authorization: token.value
-    }
-  });
-  getTodos();
+  try {
+    isLoading.value = true;
+    await axios.delete(`${apiBaseUrl}/todos/${id}`, {
+      headers: {
+        Authorization: token.value
+      }
+    });
+    isLoading.value = false;
+    getTodos();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // 切換狀態
 const toggleStatus = async (id) => {
-  await axios.patch(
-    `${apiBaseUrl}/todos/${id}/toggle`,
-    {},
-    {
-      headers: {
-        Authorization: token.value
+  try {
+    isLoading.value = true;
+    await axios.patch(
+      `${apiBaseUrl}/todos/${id}/toggle`,
+      {},
+      {
+        headers: {
+          Authorization: token.value
+        }
       }
-    }
-  );
-  getTodos();
+    );
+    isLoading.value = false;
+    getTodos();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // 登出
@@ -111,6 +131,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <Loading v-if="isLoading" />
   <!-- ToDo List -->
   <div id="todoListPage" class="bg-half">
     <nav>
